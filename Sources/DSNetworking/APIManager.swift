@@ -10,9 +10,7 @@ import Combine
 
 @available(iOS 13.0, *)
 public class APIManager: NSObject {
-    static let shared = APIManager()
-    private override init() {}
-    private var cancellable = Set<AnyCancellable>()
+    public override init() {}
     
     public func get<T: Codable>(from urlString: String, responseType: T.Type) -> Future<T, Error> {
         return Future<T, Error> { [weak self] promise in
@@ -43,7 +41,7 @@ public class APIManager: NSObject {
                 } receiveValue: { result in
                     promise(.success(result))
                 }
-                .store(in: &self.cancellable)
+                .cancel()
         }
     }
 }
