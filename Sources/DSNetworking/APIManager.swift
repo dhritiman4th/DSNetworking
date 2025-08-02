@@ -9,12 +9,10 @@ import Foundation
 import Combine
 
 @available(iOS 13.0, *)
-public class APIManager: NSObject {
-    public override init() {}
-    
+public class APIManager: NSObject {    
     public func get<T: Codable>(from urlString: String, responseType: T.Type) -> Future<T, Error> {
-        return Future<T, Error> { [weak self] promise in
-            guard let self = self, let url = URL(string: urlString) else {
+        return Future<T, Error> { promise in
+            guard let url = URL(string: urlString) else {
                 promise(.failure(APIError.invalidURL))
                 return
             }
