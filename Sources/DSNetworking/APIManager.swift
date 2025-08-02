@@ -9,10 +9,12 @@ import Foundation
 import Combine
 
 @available(iOS 13.0, *)
-public class APIManager: NSObject {    
+public class APIManager: NSObject {
+    private var cancellable = Set<AnyCancellable>()
     public func get<T: Codable>(from urlString: String, responseType: T.Type) -> Future<T, Error> {
-        return Future<T, Error> { promise in
-            guard let url = URL(string: urlString) else {
+        return Future<T, Error> { [weak self] promise in
+            guard let self = self,
+                  let url = URL(string: urlString) else {
                 promise(.failure(APIError.invalidURL))
                 return
             }
@@ -39,7 +41,7 @@ public class APIManager: NSObject {
                 } receiveValue: { result in
                     promise(.success(result))
                 }
-                .cancel()
+                .store(in: &self.cancellable)
         }
     }
 }
